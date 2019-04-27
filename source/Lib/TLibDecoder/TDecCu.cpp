@@ -440,34 +440,7 @@ Void TDecCu::xReconInter( TComDataCU* pcCU, UInt uiDepth )
     m_pConformanceCheck->flagTMctsError("motion vector across tile boundaries");
   }
 #endif
-#if LVC
-    // LVC TODO
-    for (Int comp = 0; comp < 3; comp++) {
-        const UInt uiTrUnitIdx = 0;
-        const ComponentID compID = ComponentID(comp);
-        Int uiPartWidth = 64;
-        Int uiPartHeight = 64;
-        
-        if(compID != COMPONENT_Y) {
-            uiPartWidth = 32;
-            uiPartHeight = 32;
-        }
-        
-        Pel* pSrc1 = m_ppcYuvReco[uiDepth] -> getAddr( compID, uiTrUnitIdx, uiPartWidth );
-        Int  iSrc1Stride = m_ppcYuvReco[uiDepth] -> getStride(compID);
-
-        for (Int y = uiPartHeight-1; y >= 0; y-- )
-        {
-            for (Int x = uiPartWidth-1; x >= 0; x-- )
-            {
-                pSrc1[x] = 128;
-            }
-            pSrc1 += iSrc1Stride;
-        }
-    }
-#else
   m_pcPrediction->motionCompensation( pcCU, m_ppcYuvReco[uiDepth] );
-#endif
 
 #if DEBUG_STRING
   const Int debugPredModeMask=DebugStringGetPredModeMask(MODE_INTER);

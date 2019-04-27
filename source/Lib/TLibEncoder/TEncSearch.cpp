@@ -2956,6 +2956,11 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
 Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* pcPredYuv, TComYuv* pcResiYuv, TComYuv* pcRecoYuv, Bool bUseRes )
 #endif
 {
+#if LVC
+  motionCompensation(pcCU, pcPredYuv, REF_PIC_LIST_X);
+  return;
+#endif
+    
   for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
     m_acYuvPred[i].clear();

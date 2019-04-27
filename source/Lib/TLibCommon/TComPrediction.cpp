@@ -494,6 +494,29 @@ Bool TComPrediction::xCheckIdenticalMotion ( TComDataCU* pcCU, UInt PartAddr )
 
 Void TComPrediction::motionCompensation ( TComDataCU* pcCU, TComYuv* pcYuvPred, RefPicList eRefPicList, Int iPartIdx )
 {
+#if LVC
+    // LVC TODO
+    // pcCU->getSlice()->getRefPic() 参考piRefY
+    // pcCU->getSlice()->getRefPic( eRefPicList, iRefIdxPred )->getPicYuvRec()->getAddr( COMPONENT_Y, pcCU->getCtuRsAddr(), pcCU->getZorderIdxInCtu() + uiPartAddr )
+    for (Int comp = 0; comp < pcYuvPred->getNumberValidComponents(); comp++) {
+        const ComponentID compID = ComponentID(comp);
+        Int uiPartWidth = pcCU->getWidth(0) >> pcYuvPred->getComponentScaleX(compID);
+        Int uiPartHeight = pcCU->getHeight(0) >> pcYuvPred->getComponentScaleY(compID);
+        Pel* pSrc1 = pcYuvPred->getAddr(compID, 0, uiPartWidth);
+        Int  iSrc1Stride = pcYuvPred->getStride(compID);
+        
+        for (Int y = uiPartHeight-1; y >= 0; y-- )
+        {
+            for (Int x = uiPartWidth-1; x >= 0; x-- )
+            {
+                pSrc1[x] = 128;
+            }
+            pSrc1 += iSrc1Stride;
+        }
+    }
+    return;
+#endif
+    
   Int         iWidth;
   Int         iHeight;
   UInt        uiPartAddr;

@@ -543,7 +543,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
       rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
 
       // do inter modes, SKIP and 2Nx2N
-      if( rpcBestCU->getSlice()->getSliceType() != I_SLICE )
+      if(rpcBestCU->getSlice()->getSliceType() != I_SLICE )
       {
         // 2Nx2N
         if(m_pcEncCfg->getUseEarlySkipDetection())
@@ -1296,6 +1296,10 @@ Int  TEncCu::updateCtuDataISlice(TComDataCU* pCtu, Int width, Int height)
  */
 Void TEncCu::xCheckRDCostMerge2Nx2N( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU DEBUG_STRING_FN_DECLARE(sDebug), Bool *earlyDetectionSkipMode )
 {
+#if LVC
+  return;
+#endif
+    
   assert( rpcTempCU->getSlice()->getSliceType() != I_SLICE );
   if(getFastDeltaQp())
   {
@@ -1446,6 +1450,11 @@ Void TEncCu::xCheckRDCostInter( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, 
 Void TEncCu::xCheckRDCostInter( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, PartSize ePartSize )
 #endif
 {
+#if LVC
+  if (ePartSize != SIZE_2Nx2N)
+    return;
+#endif
+    
   DEBUG_STRING_NEW(sTest)
 
   if(getFastDeltaQp())
@@ -1471,34 +1480,7 @@ Void TEncCu::xCheckRDCostInter( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, 
 
 #if AMP_MRG
   rpcTempCU->setMergeAMP (true);
-#if LVC
-    // LVC TODO
-    for (Int comp = 0; comp < 3; comp++) {
-        const UInt uiTrUnitIdx = 0;
-        const ComponentID compID = ComponentID(comp);
-        Int uiPartWidth = 64;
-        Int uiPartHeight = 64;
-        
-        if(compID != COMPONENT_Y) {
-            uiPartWidth = 32;
-            uiPartHeight = 32;
-        }
-
-        Pel* pSrc1 = m_ppcPredYuvTemp[uhDepth] -> getAddr( compID, uiTrUnitIdx, uiPartWidth );
-        Int  iSrc1Stride = m_ppcPredYuvTemp[uhDepth] -> getStride(compID);
-
-        for (Int y = uiPartHeight-1; y >= 0; y-- )
-        {
-            for (Int x = uiPartWidth-1; x >= 0; x-- )
-            {
-                pSrc1[x] = 128;
-            }
-            pSrc1 += iSrc1Stride;
-        }
-    }
-#else
   m_pcPredSearch->predInterSearch ( rpcTempCU, m_ppcOrigYuv[uhDepth], m_ppcPredYuvTemp[uhDepth], m_ppcResiYuvTemp[uhDepth], m_ppcRecoYuvTemp[uhDepth] DEBUG_STRING_PASS_INTO(sTest), false, bUseMRG );
-#endif
 #else
   m_pcPredSearch->predInterSearch ( rpcTempCU, m_ppcOrigYuv[uhDepth], m_ppcPredYuvTemp[uhDepth], m_ppcResiYuvTemp[uhDepth], m_ppcRecoYuvTemp[uhDepth] );
 #endif
